@@ -3,6 +3,7 @@ package br.com.alura.helloapp.navigation
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -10,12 +11,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import br.com.alura.helloapp.FormularioContato
 import br.com.alura.helloapp.R
+import br.com.alura.helloapp.data.Contato
+import br.com.alura.helloapp.database.HelloAppDatabase
 import br.com.alura.helloapp.ui.form.FormularioContatoTela
 import br.com.alura.helloapp.ui.form.FormularioContatoViewModel
 import br.com.alura.helloapp.util.ID_CONTATO
+import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.formularioContatoGraph(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     composable(
         route = FormularioContato.rotaComArgumentos,
@@ -28,6 +32,8 @@ fun NavGraphBuilder.formularioContatoGraph(
             val viewModel = hiltViewModel<FormularioContatoViewModel>()
             val state by viewModel.uiState.collectAsState()
             val context = LocalContext.current
+            val dao = HelloAppDatabase.getDatabase(context).contatoDao()
+            val coroutineScope = rememberCoroutineScope()
 
             LaunchedEffect(state.aniversario) {
                 viewModel.defineTextoAniversario(
@@ -35,10 +41,25 @@ fun NavGraphBuilder.formularioContatoGraph(
                 )
             }
 
+
             FormularioContatoTela(
                 state = state,
                 onClickSalvar = {
-                    navController.popBackStack()
+
+                    with(state) {
+                        coroutineScope.launch {
+                            dao.insere(
+                                Contato(
+                                    nome = nome,
+                                    sobrenome = sobrenome,
+                                    telefone = telefone,
+                                    aniversario = aniversario,
+                                    fotoPerfil = fotoPerfil,
+                                )
+                            )
+                        }
+                        navController.popBackStack()
+                    }
                 },
                 onCarregarImagem = {
                     viewModel.carregaImagem(it)

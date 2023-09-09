@@ -2,7 +2,7 @@ package br.com.alura.helloapp.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import java.util.Date
 
 @Entity
 data class Contato(
