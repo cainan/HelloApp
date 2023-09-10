@@ -3,15 +3,19 @@ package br.com.alura.helloapp.ui.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.alura.helloapp.database.ContatoDao
 import br.com.alura.helloapp.util.ID_CONTATO
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class DetalhesContatoViewlModel(
-    savedStateHandle: SavedStateHandle
+@HiltViewModel
+class DetalhesContatoViewlModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val contatoDao: ContatoDao,
 ) : ViewModel() {
 
     private val idContato = savedStateHandle.get<Long>(ID_CONTATO)
@@ -27,6 +31,21 @@ class DetalhesContatoViewlModel(
     }
 
     private suspend fun carregaContato() {
+        idContato?.let {
+            val contato = contatoDao.buscaPorId(it)
+            contato?.let { contato ->
+                with(contato) {
+                    _uiState.value = _uiState.value.copy(
+                        id = id,
+                        nome = nome,
+                        sobrenome = sobrenome,
+                        telefone = telefone,
+                        aniversario = aniversario,
+                        fotoPerfil = fotoPerfil
+                    )
+                }
+            }
+        }
     }
 
     suspend fun removeContato() {
