@@ -13,13 +13,4 @@ import br.com.alura.helloapp.database.converter.Converter
 abstract class HelloAppDatabase : RoomDatabase() {
     abstract fun contatoDao(): ContatoDao
 
-    companion object {
-        fun getDatabase(context: Context): HelloAppDatabase {
-            return Room.databaseBuilder(
-                context,
-                HelloAppDatabase::class.java,
-                "helloApp.db"
-            ).build()
-        }
-    }
 }

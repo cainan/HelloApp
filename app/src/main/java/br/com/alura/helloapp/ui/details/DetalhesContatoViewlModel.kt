@@ -32,19 +32,24 @@ class DetalhesContatoViewlModel @Inject constructor(
 
     private suspend fun carregaContato() {
         idContato?.let {
-            val contato = contatoDao.buscaPorId(it)
-            contato?.let { contato ->
-                with(contato) {
-                    _uiState.value = _uiState.value.copy(
-                        id = id,
-                        nome = nome,
-                        sobrenome = sobrenome,
-                        telefone = telefone,
-                        aniversario = aniversario,
-                        fotoPerfil = fotoPerfil
-                    )
+            val contatoFlow = contatoDao.buscaPorId(it)
+            contatoFlow.collect { flow ->
+                flow?.let { contato ->
+                    contato?.let {
+                        with(contato) {
+                            _uiState.value = _uiState.value.copy(
+                                id = id,
+                                nome = nome,
+                                sobrenome = sobrenome,
+                                telefone = telefone,
+                                aniversario = aniversario,
+                                fotoPerfil = fotoPerfil
+                            )
+                        }
+                    }
                 }
             }
+
         }
     }
 

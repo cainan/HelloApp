@@ -21,8 +21,11 @@ class ListaContatosViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val contatos = dao.buscaTodos()
-            _uiState.value = _uiState.value.copy(contatos = contatos)
+            val contatoFlow = dao.buscaTodos()
+            contatoFlow.collect { contatos ->
+                _uiState.value = _uiState.value.copy(contatos = contatos)
+            }
+
         }
     }
 }

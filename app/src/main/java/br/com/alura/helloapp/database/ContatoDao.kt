@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import br.com.alura.helloapp.data.Contato
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContatoDao {
@@ -13,8 +14,8 @@ interface ContatoDao {
     suspend fun insere(contato: Contato)
 
     @Query("SELECT * FROM Contato")
-    suspend fun buscaTodos(): List<Contato>
+    fun buscaTodos(): Flow<List<Contato>>
 
     @Query("SELECT * FROM Contato WHERE id = :id")
-    suspend fun buscaPorId(id: Long?): Contato?
+    fun buscaPorId(id: Long?): Flow<Contato?>
 }
