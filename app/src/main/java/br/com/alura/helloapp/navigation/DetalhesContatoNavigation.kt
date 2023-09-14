@@ -18,7 +18,7 @@ import br.com.alura.helloapp.util.ID_CONTATO
 import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.detalhesContatoGraph(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     composable(
         route = DetalhesContato.rotaComArgumentos,
@@ -38,7 +38,9 @@ fun NavGraphBuilder.detalhesContatoGraph(
                 state = state,
                 onClickVoltar = { navController.popBackStack() },
                 onApagaContato = {
+
                     scope.launch {
+                        viewModel.removeContato()
                         context.mostraMensagem(context.getString(R.string.contato_apagado))
                     }
                     navController.popBackStack()
