@@ -5,15 +5,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import br.com.alura.helloapp.DestinosHelloApp
-import br.com.alura.helloapp.preferences.PreferencesKey
 import br.com.alura.helloapp.preferences.dataStore
 import br.com.alura.helloapp.ui.login.FormularioLoginTela
 import br.com.alura.helloapp.ui.login.FormularioLoginViewModel
@@ -34,6 +31,7 @@ fun NavGraphBuilder.loginGraph(
         ) {
             val viewModel = hiltViewModel<LoginViewModel>()
             val state by viewModel.uiState.collectAsState()
+            val scope = rememberCoroutineScope()
 
             if (state.logado) {
                 LaunchedEffect(Unit) {
@@ -41,26 +39,11 @@ fun NavGraphBuilder.loginGraph(
                 }
             }
 
-            val dataStore = LocalContext.current.dataStore
-            val scope = rememberCoroutineScope()
-
             LoginTela(
                 state = state,
                 onClickLogar = {
                     scope.launch {
-                        dataStore.data.collect { settings ->
-                            val user = settings[PreferencesKey.USER]
-                            val password = settings[PreferencesKey.PASSWORD]
-
-                            if (user == state.usuario && password == state.senha) {
-                                dataStore.edit {
-                                    it[booleanPreferencesKey("logado")] = true
-                                }
-                                viewModel.tentaLogar()
-                            } else {
-                                state.onErro(true)
-                            }
-                        }
+                        viewModel.tentaLogar()
                     }
                 },
                 onClickCriarLogin = {
@@ -81,10 +64,7 @@ fun NavGraphBuilder.loginGraph(
                 state = state,
                 onSalvar = {
                     scope.launch {
-                        dataStore.edit { settings ->
-                            settings[PreferencesKey.USER] = state.nome
-                            settings[PreferencesKey.PASSWORD] = state.senha
-                        }
+                        viewModel.saveUser()
                     }
                     navController.navegaLimpo(DestinosHelloApp.Login.rota)
                 }

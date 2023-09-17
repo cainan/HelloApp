@@ -29,7 +29,7 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     private suspend fun definiDestinoInicial() {
-        delay(3000)
+        delay(1000)
         dataStore.data.collect { preference ->
             val logado =
                 if (preference[PreferencesKey.LOGADO] == true) AppState.Logado else AppState.Deslogado
